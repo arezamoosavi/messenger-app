@@ -2,6 +2,7 @@ version: '3'
 
 volumes:
   mgdata:
+  redisdata:
   static_files:
   uploaded_files:
 
@@ -28,6 +29,7 @@ services:
       - ./.app_envs/.gunicorn
     depends_on:
       - mongodb
+      - redis
 
   mongodb:
     image: mongo
@@ -71,3 +73,13 @@ services:
     depends_on:
       - app
       - mongodb
+
+  redis:
+    restart: always
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    expose:
+      - "6379"
+    volumes:
+      - redisdata:/data
