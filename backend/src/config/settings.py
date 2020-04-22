@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -22,6 +23,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'simple_email_confirmation',
     'core',
     'apps.chat',
 ]
@@ -143,6 +145,12 @@ EMAIL_HOST_PASSWORD = os.environ.get("ENV_EMAIL_HOST_PASSWORD")
 EMAIL_USE_SSL = os.environ.get("ENV_EMAIL_USE_SSL", True)
 EMAIL_USE_TSL = os.environ.get("ENV_EMAIL_USE_TSL", False)
 
+# Email Confirmation
+EMAIL_CONFIRMATION_PERIOD_DAYS = 7
+SIMPLE_EMAIL_CONFIRMATION_PERIOD = timedelta(days=EMAIL_CONFIRMATION_PERIOD_DAYS)
+SIMPLE_EMAIL_CONFIRMATION_AUTO_ADD = False
+SIMPLE_EMAIL_CONFIRMATION_KEY_LENGTH = 10
+SIMPLE_EMAIL_CONFIRMATION_EMAIL_ADDRESS_MODEL = os.environ.get("ENV_EMAIL_HOST_USER")
 
 # Log
 LOGGING = {

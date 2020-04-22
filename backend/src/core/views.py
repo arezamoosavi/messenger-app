@@ -1,14 +1,34 @@
-from rest_framework import generics, authentication, permissions
+from rest_framework import generics, authentication, permissions, , status
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.settings import api_settings
-
 from .serializers import UserSerializer, AuthTokenSerializer
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class CreateUserView(generics.CreateAPIView):
     """Create a new user in the system"""
     serializer_class = UserSerializer
 
+class ConfirmUserEmail(generics.GenericAPIView):
+    
+    def post(self, request, *args, **kwargs):
+        if 'key' in request.data:
+            user = request.user
+            user.confirm_email(request.data.get('key'))
+            if user.is_confirmed :
+                data = {"status": "Your account is verified! Wait 24 hour to get activated!"}
+                logger.info('successfull verification')    
+                return Response(data = data,status=status.HTTP_200_OK)
+            else:
+                data = {"status": "Key is wrong, your account in not verified!"}
+                logger.info('unsuccessfull verification')    
+                return Response(data = data,status=status.HTTP_200_OK)
+        else:
+            data = {"status": "There is No Key!"}
+            logger.info('unsuccessfull verification')    
+            return Response(data = data,status=status.HTTP_200_OK)
 
 class CreateTokenView(ObtainAuthToken):
     """Create a new auth token for user"""
