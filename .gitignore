@@ -233,3 +233,5 @@ pip-selfcheck.json
 *.pid
 
 *.log
+
+backend/.app_envs/.smtpconfig

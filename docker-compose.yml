@@ -9,7 +9,7 @@ volumes:
 services:
 
   python:
-    # container_name: app
+    container_name: python
     build:
       context: .
       dockerfile: ./dockerfiles/python/Dockerfile
@@ -25,14 +25,17 @@ services:
     restart: always
     env_file:
       - ./.app_envs/.web
-      - ./.app_envs/.postgres
+      - ./.app_envs/.mongodb
       - ./.app_envs/.gunicorn
+      - ./.app_envs/.smtpconfig
     depends_on:
       - mongodb
       - redis
+      - rabbitmq
+      - celery_worker
 
   mongodb:
-    image: mongo
+    image: "mongo:4.0.4"
     restart: always
     volumes:
       - mgdata:/var/lib/mongodb/data/
@@ -72,7 +75,6 @@ services:
       - uploaded_files:/uploaded_files
     depends_on:
       - app
-      - mongodb
 
   redis:
     restart: always
@@ -83,3 +85,18 @@ services:
       - "6379"
     volumes:
       - redisdata:/data
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    restart: on-failure
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+
+  celery_worker:
+    <<: *python
+    command: celery -A tickets worker --loglevel=info
+    depends_on:
+      - rabbitmq
+      - mongodb
+      - redis

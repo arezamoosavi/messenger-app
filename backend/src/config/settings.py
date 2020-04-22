@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -123,6 +124,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, '/vol/web/media')
+STATIC_ROOT = os.path.join(BASE_DIR, '/vol/web/static')
+
+AUTH_USER_MODEL = 'core.User'
 
 # Caching
 CACHES = {
@@ -134,3 +141,66 @@ CACHES = {
         }
     }
 }
+
+# Celery
+
+CELERY_BROKER_URL = "amqp://rabbitmq"
+CELERY_ACCEPT_CONTENT = ['json',]
+CELERY_TASK_SERIALIZER = 'json'
+
+# Email
+
+EMAIL_HOST = os.environ.get("ENV_EMAIL_HOST","smtp.fastmail.com")
+EMAIL_PORT = os.environ.get("ENV_EMAIL_PORT",465)
+EMAIL_HOST_USER = os.environ.get("ENV_EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("ENV_EMAIL_HOST_PASSWORD")
+EMAIL_USE_SSL = os.environ.get("ENV_EMAIL_USE_SSL", True)
+EMAIL_USE_TSL = os.environ.get("ENV_EMAIL_USE_TSL", False)
+
+
+# Log
+LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'request_format': {
+                'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d (%(message)s) '
+                          '%(remote_addr)s %(user_id)s "%(request_method)s '
+                          '%(path_info)s %(server_protocol)s" %(http_user_agent)s ',
+            },
+            'verbose': {
+                'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d (%(message)s) '
+            },
+        },
+        'handlers': {
+            'console_django': {
+                'class': 'logging.StreamHandler',
+                # 'filters': ['request'],
+                'formatter': 'verbose',
+            },
+            'console_project': {
+                'class': 'logging.StreamHandler',
+                # 'filters': ['request'],
+                'formatter': 'request_format',
+            },
+            'file': {
+                'class': 'logging.FileHandler',
+                'filename': BASE_DIR + '/logs' + 'debug.log'
+            },
+        },
+        'loggers': {
+            'django.server': {
+                'level': 'DEBUG',
+                'handlers': ['console_django'],
+
+            },
+            'django.request': {
+                'level': 'DEBUG',
+                'handlers': ['console_django'],
+            },
+            'apps': {
+                'level': 'DEBUG',
+                'handlers': ['file', 'console_django'],
+            }
+        },
+    }

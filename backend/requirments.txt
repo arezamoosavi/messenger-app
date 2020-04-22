@@ -2,6 +2,7 @@ Django==2.2.6
 djangorestframework==3.11.0
 django-redis
 djongo
+celery==4.4.2
 gunicorn
 daphne
 channels
