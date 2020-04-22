@@ -4,6 +4,7 @@ django-widget-tweaks==1.4.1
 django-simple-email-confirmation
 django-redis
 djongo
+psycopg2-binary
 celery==4.4.2
 gunicorn
 daphne

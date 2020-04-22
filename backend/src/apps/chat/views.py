@@ -1,11 +1,11 @@
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User
+from core.models import User
 from django.http.response import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
-from .models import Message, UserProfile
-from .serializers import MessageSerializer, UserSerializer
+from apps.chat.models import Message, UserProfile
+from apps.chat.serializers import MessageSerializer, UserSerializer
 
 
 def index(request):

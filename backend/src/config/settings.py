@@ -48,7 +48,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR,  'templates')],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -62,7 +62,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
-
+ASGI_APPLICATION = "config.routing.application"
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
@@ -119,8 +119,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, '/vol/web/media')
-STATIC_ROOT = os.path.join(BASE_DIR, '/vol/web/static')
+MEDIA_ROOT = os.path.join(BASE_DIR, '/uploaded_files')
+STATIC_ROOT = os.path.join(BASE_DIR, '/static_files')
 
 AUTH_USER_MODEL = 'core.User'
 
@@ -162,7 +162,7 @@ EMAIL_CONFIRMATION_PERIOD_DAYS = 7
 SIMPLE_EMAIL_CONFIRMATION_PERIOD = timedelta(days=EMAIL_CONFIRMATION_PERIOD_DAYS)
 SIMPLE_EMAIL_CONFIRMATION_AUTO_ADD = False
 SIMPLE_EMAIL_CONFIRMATION_KEY_LENGTH = 10
-SIMPLE_EMAIL_CONFIRMATION_EMAIL_ADDRESS_MODEL = os.environ.get("ENV_EMAIL_HOST_USER")
+# SIMPLE_EMAIL_CONFIRMATION_EMAIL_ADDRESS_MODEL = os.environ.get("ENV_EMAIL_HOST_USER")
 
 # Log
 LOGGING = {

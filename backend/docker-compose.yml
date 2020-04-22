@@ -1,7 +1,8 @@
 version: '3'
 
 volumes:
-  mgdata:
+  # mgdata:
+  pgdata:
   redisdata:
   static_files:
   uploaded_files:
@@ -29,42 +30,58 @@ services:
       - ./.app_envs/.gunicorn
       - ./.app_envs/.smtpconfig
     depends_on:
-      - mongodb
+      # - mongodb
+      - postgres
       - redis
       - rabbitmq
       - celery_worker
 
-  mongodb:
-    image: "mongo:4.0.4"
-    restart: always
-    volumes:
-      - mgdata:/var/lib/mongodb/data/
-    env_file:
-      - ./.app_envs/.mongodb
-    # environment:
-    #   MONGO_INITDB_ROOT_USERNAME: mguz
-    #   MONGO_INITDB_ROOT_PASSWORD: mguzpass
-    #   MONGO_INITDB_DATABASE: mguzdb
-    ports:
-      - 27017:27017
+  postgres:
+    image: postgres:9.6-alpine
 
-  mongo-express:
-    image: mongo-express
-    restart: always
+    volumes:
+      - pgdata:/var/lib/postgresql/data/
     env_file:
-      - ./.app_envs/.mongodb
-    ports:
-      - 8081:8081
+      - ./.app_envs/.postgres
     # environment:
-    #   ME_CONFIG_MONGODB_ADMINUSERNAME: mguz
-    #   ME_CONFIG_MONGODB_ADMINPASSWORD: mguzpass
+    #   - POSTGRES_USER=user
+    #   - POSTGRES_PASSWORD=password
+    #   - POSTGRES_DB=db
+    ports:
+      - 5432:5432
+
+
+  # mongodb:
+  #   image: "mongo:4.0.4"
+  #   restart: always
+  #   volumes:
+  #     - mgdata:/var/lib/mongodb/data/
+  #   # env_file:
+  #   #   - ./.app_envs/.mongodb
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: mguz
+  #     MONGO_INITDB_ROOT_PASSWORD: mguzpass
+  #     MONGO_INITDB_DATABASE: mguzdb
+  #   ports:
+  #     - 27017:27017
+
+  # mongo-express:
+  #   image: mongo-express
+  #   restart: always
+  #   env_file:
+  #     - ./.app_envs/.mongodb
+  #   ports:
+  #     - 8081:8081
+  #   environment:
+  #     ME_CONFIG_MONGODB_ADMINUSERNAME: mguz
+  #     ME_CONFIG_MONGODB_ADMINPASSWORD: mguzpass
 
 
   nginx:
     container_name: nginx
     build:
       context: . # We set this context to load the app requirements when building the image
-      dockerfile: dockerfiles/nginx/Dockerfile
+      dockerfile: ./dockerfiles/nginx/Dockerfile
     ports:
       - "8000:8000"
     expose:
@@ -74,7 +91,7 @@ services:
       - static_files:/static_files
       - uploaded_files:/uploaded_files
     depends_on:
-      - app
+      - python
 
   redis:
     restart: always
@@ -94,9 +111,14 @@ services:
       - "5672:5672"
 
   celery_worker:
-    <<: *python
-    command: celery -A tickets worker --loglevel=info
+    build:
+      context: .
+      dockerfile: ./dockerfiles/python/Dockerfile
+    command: celery -A config.celery worker --loglevel=info
     depends_on:
       - rabbitmq
-      - mongodb
+      - postgres
       - redis
+    volumes:
+    - ./src:/src
+  

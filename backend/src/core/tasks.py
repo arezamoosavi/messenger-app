@@ -1,7 +1,7 @@
 import string
 from celery import shared_task
 import logging
-from django.core.mail import 
+from django.core.mail import send_mail
 
 
 logger = logging.getLogger(__name__)
@@ -14,5 +14,6 @@ def queue_messege(msg):
 
 @shared_task
 def send_verification_email(subject, message, host_email, recipients):
+   
     send_mail(subject=subject, body=message,
                                  from_email=host_email, to=recipients)
